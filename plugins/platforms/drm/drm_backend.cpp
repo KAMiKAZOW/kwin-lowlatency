@@ -607,6 +607,7 @@ DrmOutput *DrmBackend::findOutput(const QByteArray &uuid)
 
 void DrmBackend::present(DrmBuffer *buffer, DrmOutput *output)
 {
+    drmVBlank vblank;
     if (!buffer || buffer->bufferId() == 0) {
         if (m_deleteBufferAfterPageFlip) {
             delete buffer;
@@ -622,6 +623,9 @@ void DrmBackend::present(DrmBuffer *buffer, DrmOutput *output)
     } else if (m_deleteBufferAfterPageFlip) {
         delete buffer;
     }
+    vblank.request.type=DRM_VBLANK_RELATIVE;
+    vblank.request.sequence=1;
+    drmWaitVBlank(m_fd,&vblank);
 }
 
 void DrmBackend::initCursor()
